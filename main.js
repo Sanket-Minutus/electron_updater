@@ -4,6 +4,7 @@ const Globals = require("./globals");
 const { autoUpdater, AppUpdater } = require("electron-updater");
 
 let curWindow;
+const TWO_MINUTES = 2 * 60 * 1000;
 
 //Basic flags
 autoUpdater.autoDownload = false;
@@ -28,6 +29,14 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length == 0) createWindow();
   });
 
+  setInterval(() => {
+    console.log("Checking for updates (scheduled)");
+    curWindow.window.webContents.send(
+      "updateMessage",
+      `Scheduled update check. Current version ${app.getVersion()}`
+    );
+    autoUpdater.checkForUpdates(); // Check for updates every 2 minutes
+  }, TWO_MINUTES);
 });
 // Function to send a native notification
 function showNotification (title, body) {
